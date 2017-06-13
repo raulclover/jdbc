@@ -3,6 +3,7 @@ package prepst;
 import com.mysql.fabric.jdbc.FabricMySQLDriver;
 
 import java.sql.*;
+import java.util.Scanner;
 
 /**
  * Created by Сергей on 05.06.2017.
@@ -17,6 +18,10 @@ public class Main {
 
     public static void main(String[] args)
     {
+        Scanner sc = new Scanner(System.in);
+
+
+
         Connection connection=null;
         PreparedStatement preparedStatement=null;
 
@@ -25,33 +30,70 @@ public class Main {
             DriverManager.registerDriver(driver);
             connection= DriverManager.getConnection(URL,LOGIN,PASSWORD);
 
-            //INSERT
-            /* preparedStatement=connection.prepareStatement(INSERT_NEW);
-            preparedStatement.setInt(1,3);
-            preparedStatement.setString(2,"Maestro");
-            preparedStatement.setString(3,"mate");
-
-            preparedStatement.execute();*/
-
-            //SELECT
-            preparedStatement=connection.prepareStatement(GET_ALL);
-            ResultSet res =preparedStatement.executeQuery();
-
-            while (res.next())
+            System.out.println("Set 'ins' to insert, 'del' to delete, 'show' to show all, 'exit' to finish");
+            boolean f=true;
+            while (f)
             {
-                int id=res.getInt("id");
-                String username=res.getString("username");
-                String password=res.getString("password");
+                System.out.println("Set command: ");
+                String command=sc.next();
 
-                System.out.println("{Id: "+id+", username: "+username+", password: "+password+"}");
+
+                if(command.equals("ins"))
+                {
+                    //INSERT
+                    System.out.print("Set ID:");
+                    int sid = sc.nextInt();
+
+                    System.out.print("Set un:");
+                    String unn = sc.next();
+
+                    System.out.print("Set password:");
+                    String pw = sc.next();
+                    preparedStatement=connection.prepareStatement(INSERT_NEW);
+
+
+                    preparedStatement.setInt(1,sid);
+                    preparedStatement.setString(2,unn);
+                    preparedStatement.setString(3,pw);
+
+                    preparedStatement.executeUpdate();
+
+
+                }
+                if(command.equals("del"))
+                {
+                    //delete
+                    System.out.print("Set ID to delete:");
+                    int sid = sc.nextInt();
+                    preparedStatement=connection.prepareStatement(DELETE);
+                    preparedStatement.setInt(1,sid);
+                    preparedStatement.executeUpdate();
+
+
+                }
+                if(command.equals("show"))
+                {
+                    preparedStatement=connection.prepareStatement(GET_ALL);
+                    ResultSet res =preparedStatement.executeQuery();
+
+
+                    while (res.next())
+                    {
+                        int id=res.getInt("id");
+                        String username=res.getString("username");
+                        String password=res.getString("password");
+
+                        System.out.println("{Id: "+id+", username: "+username+", password: "+password+"}");
+                    }
+
+                }
+                if(command.equals("exit"))
+                {
+                    System.out.println("bye");
+                    f=false;
+
+                }
             }
-
-            //DELETE
-            /*preparedStatement=connection.prepareStatement(DELETE);
-            preparedStatement.setInt(1,3);
-            preparedStatement.executeUpdate();*/
-
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
